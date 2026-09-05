@@ -26,7 +26,7 @@
 <sup>1</sup> Apenas número do RENAVAM  
 <sup>2</sup> Disponível apenas no Relatório Web
 
-# Arquitetura
+# Arquitetura desta Biblioteca
 1. **Camada de Transporte / Cliente HTTP Base (```http_client.py```)**  
     Essa camada não sabe nada sobre as regras de negócio da API, apenas sobre o protocolo HTTP.  
 
@@ -49,3 +49,13 @@
     3. Passa o resultado pelo validador de resposta.
     4. Envia os dados limpos para a camada de Modelagem.
     5. Retorna o Objeto Padronizado pronto para quem chamou.
+
+3. **Camada de Exceções (```exceptions.py```)**  
+    A biblioteca deve falar a sua própria língua quando algo der errado.
+
+    Responsabilidade: 
+    1. Definir uma hierarquia clara de erros.
+        * Erros de rede/transporte (ConnectionError, TimeoutError).
+        * Erros HTTP clássicos (AuthenticationError, RateLimitError).
+        * Erros de Domínio/Negócio: Exceções disparadas quando o HTTP é 200, mas a resposta contém campos como "tipo_erro".
+
