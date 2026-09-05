@@ -22,7 +22,7 @@ class APIConnector():
 
         try:
             resposta = self._session.request(method=metodo,
-                                             endpoint=rota,
+                                             url=rota,
                                              **kwargs)
             resposta.raise_for_status()
             return resposta

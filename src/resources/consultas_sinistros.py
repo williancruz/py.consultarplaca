@@ -1,15 +1,19 @@
-from http_client import APIConnector as conn
+from http_client import APIConnector
 
 
-def consultar_perda_total(placa: str) -> dict:
-    resposta = conn._request("GET",
-                             "/consultarSinistroComPerdaTotal",
-                             params={"placa": placa})
-    return resposta.json()
+class ConsultasSinistros:
 
+    def __init__(self, conector: APIConnector) -> None:
+        self._conn = conector
 
-def consultar_hist_roubo_furto(placa: str) -> dict:
-    resposta = conn._request("GET",
-                             "/consultarHistoricoRouboFurto",
-                             params={"placa": placa})
-    return resposta.json()
+    def consultar_perda_total(self, placa: str) -> dict:
+        resposta = self._conn._request("GET",
+                                       "/consultarSinistroComPerdaTotal",
+                                       params={"placa": placa})
+        return resposta.json()
+
+    def consultar_hist_roubo_furto(self, placa: str) -> dict:
+        resposta = self._conn._request("GET",
+                                       "/consultarHistoricoRouboFurto",
+                                       params={"placa": placa})
+        return resposta.json()
