@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from utils import _FromDictMixin, _navegar_json
+from utils import _FromDictMixin, _navegar_json, _parse_valor_brl
 
 
 # =============================================================================
@@ -145,6 +145,102 @@ class RegistroPerdaTotal:
         elif dados["possui_registro"] == "nao":
             return cls(possui_registro=False)
         elif dados["possui_registro"] == "indisponivel":
+            return cls(possui_registro=None)
+        else:
+            pass
+
+
+# =============================================================================
+# CONSULTA DE DÉBITOS POR INFRAÇÕES — RENAINF
+# =============================================================================
+@dataclass
+class _Infracao(_FromDictMixin):
+    infracao: str = ""
+    numero_auto_infracao: str = ""
+    valor_aplicado: float = 0.0
+    orgao_autuador: str = ""
+    tipo_auto_infracao: str = ""
+    local_infracao: str = ""
+    municipio: str = ""
+    unidade_medida: str = ""
+    limite_permitido: str = ""
+    medicao_considerada: str = ""
+    medicao_real: str = ""
+    data_hora_infracao: str = ""
+    data_cadastramento: str = ""
+    data_notificacao: str = ""
+    data_emissao_penalidade: str = ""
+
+    @classmethod
+    def from_api_response(cls, item: dict):
+        # junta os 3 sub-dicts num só e deixa o FromDictMixin resolver
+        flat: dict = {
+            **item.get("dados_infracao", {}),
+            **item.get("aplicacao", {}),
+            **item.get("eventos", {}),
+        }
+        infracao = cls.from_dict(flat)
+        infracao.valor_aplicado = _parse_valor_brl(flat.get("valor_aplicado"))
+        return infracao
+
+
+@dataclass
+class RegistroInfracoes:
+    possui_infracoes: bool = False
+    infracoes: list[_Infracao] = field(default_factory=list)
+
+    @classmethod
+    def from_api_response(cls, resposta_api: dict):
+        _PATH: tuple = ("dados",
+                        "registro_debitos_por_infracoes_renainf",
+                        "infracoes_renainf")
+        dados: dict = _navegar_json(resposta_api, _PATH)
+
+        if dados.get("possui_infracoes") == "sim":
+            infracoes: list[_Infracao] = []
+
+            for item in dados.get("infracoes", []):
+                infracoes.append(_Infracao.from_api_response(item))
+
+            return cls(possui_infracoes=True, infracoes=infracoes)
+        elif dados.get("possui_infracoes") == "nao":
+            return False
+        else:
+            pass
+
+
+# =============================================================================
+# CONSULTA DE HISTÓRICO DE ROUBO/FURTO
+# =============================================================================
+@dataclass
+class _BoletimOcorrencia(_FromDictMixin):
+    boletim_ocorrencia: str = ""
+    data_boletim_ocorrencia: str = ""
+    tipo_ocorrencia: str = ""
+    uf_ocorrencia: str = ""
+
+
+@dataclass
+class RegistroRouboFurto:
+    possui_registro: bool | None = None
+    registros: list[_BoletimOcorrencia] = field(default_factory=list)
+
+    @classmethod
+    def from_api_response(cls, resposta_api: dict):
+        _PATH: tuple = ("dados", "historico_roubo_furto",
+                        "registros_roubo_furto")
+        dados: dict = _navegar_json(resposta_api, _PATH)
+
+        if dados.get("possui_registro") == "sim":
+            registros: list[_BoletimOcorrencia] = []
+
+            for item in dados.get("registros", []):
+                registros.append(_BoletimOcorrencia.from_dict(item))
+
+            return cls(possui_registro=True, registros=registros)
+        elif dados.get("possui_registro") == "nao":
+            return cls(possui_registro=False)
+        elif dados.get("possui_registro") == "indisponivel":
             return cls(possui_registro=None)
         else:
             pass

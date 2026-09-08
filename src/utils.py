@@ -1,6 +1,10 @@
 from dataclasses import fields
 from typing import Any
 from exceptions import CampoAusenteErro
+from datetime import datetime
+import locale
+
+locale.setlocale(locale.LC_NUMERIC, "pt_BR.UTF-8")
 
 
 class _FromDictMixin:
@@ -32,3 +36,9 @@ def _navegar_json(data: dict, chaves: tuple):
         atual = atual[chave]
 
     return atual
+
+
+def _parse_valor_brl(valor: str | None) -> float:
+    if not valor:
+        return 0.0
+    return locale.atof(valor)
