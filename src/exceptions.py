@@ -33,16 +33,21 @@ class RespostaInesperadaErro(ConsultarPlacaError):
 
 class RequisicaoInvalidaErro(RespostaFalhouErro):
     """HTTP 400 Bad Request :: Algum parâmetro está fora do padrão exigido"""
+    # placa testada : AAAA0000
+    # testado em 07/09/2026
 
 
 class UsuarioInvalidoErro(RespostaFalhouErro):
     """HTTP 401 Unauthorized :: Usuário ou token incorreto"""
+    # testado utilizando alterando uma letra do token verdadeiro
+    # testado em 07/09/2026
     pass
 
 
 class CreditosInsuficientesErro(RespostaFalhouErro):
     """HTTP 402 Payment Required :: Créditos insuficientes"""
     # tipo_erro=credito_insuficiente
+    # testado em 07/09/2026
     pass
 
 
@@ -56,11 +61,13 @@ class RecursoBloqueadoErro(RespostaFalhouErro):
 
 class RecursoInexistenteErro(RespostaFalhouErro):
     """HTTP 404 Not Found :: Recurso/rota solicitada não existe"""
+    # testado em 07/09/2026 utilizando uma string aleatória
     pass
 
 
 class LimiteExcedidoErro(RespostaFalhouErro):
     """HTTP 429 Too Many Requests :: >120 consultas em apenas 1 minuto"""
+    # testado em 07/09/2026 utilizando loop
     pass
 
 # =============================================================================
@@ -78,15 +85,21 @@ class CampoAusenteErro(RespostaInesperadaErro):
     pass
 
 
-class PlacaNaoEncontradaErro(RespostaInesperadaErro):
+class PlacaNaoEncontradaErro(RequisicaoInvalidaErro):
     """Placa informada realmente não existe ou serviço de consulta fora do ar"""
     # tipo_erro=placa_nao_encontrada
+    # erro http 400 bad request
+    # placa testada : NAG-0000 (Acre)
+    # testado em 08/09/2026
     pass
 
 
-class ChassiNaoEncontradoErro(RespostaInesperadaErro):
+class ChassiNaoEncontradoErro(RequisicaoInvalidaErro):
     """Chassi informado realmente não existe ou serviço de consulta fora do ar"""
     # tipo_erro=chassi_nao_encontrado
+    # erro http 400 bad request
+    # chassi testado : 6FlAB5vwhc5S18631
+    # testado em 08/09/2026
     pass
 
 
