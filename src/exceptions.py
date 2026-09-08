@@ -19,10 +19,7 @@ class ConexaoFalhouErro(Exception):
 
 class RespostaFalhouErro(Exception):
     "A conexão está OK, mas o HTTP retornou algo diferente de '200 OK'"
-
-    def __init__(self, mensagem: str = "", resposta=None):
-        super().__init__(mensagem)
-        self.resposta = resposta  # <-- Isso resolve o TypeError!
+    pass
 
 
 class RespostaInesperadaErro(ConsultarPlacaError):
