@@ -67,6 +67,16 @@ class _DadosVeiculo(_FromDictMixin):
     uf_municipio: str = ""
     renavam: str = ""
 
+    @classmethod
+    def from_dict(cls, dados: dict | None):
+        dados = dados or {}
+
+        # fallback para typo da documentação/API
+        if not dados.get("ano_fabricacao"):
+            dados["ano_fabricacao"] = dados.get("ano_frabricacao", "")
+
+        return super().from_dict(dados)
+
 
 @dataclass
 class _DadosTecnicos(_FromDictMixin):
@@ -244,3 +254,40 @@ class RegistroRouboFurto:
             return cls(possui_registro=None)
         else:
             pass
+
+
+# =============================================================================
+# CONSULTA DE PREÇOS FIPE
+# =============================================================================
+@dataclass
+class _InfoFipe(_FromDictMixin):
+    codigo_fipe: str = ""
+    modelo_versao: str = ""
+    preco: float = 0.0
+    mes_referencia: str = ""
+    historico: dict = field(default_factory=dict)
+
+    @classmethod
+    def from_api_response(cls, item: dict):
+        info_fipe = cls.from_dict(item)
+        info_fipe.preco = _parse_valor_brl(item.get("preco"))
+        return info_fipe
+
+
+@dataclass
+class PrecosFipe:
+    veiculo: Veiculo = field(default_factory=Veiculo)
+    informacoes_fipe: list[_InfoFipe] = field(default_factory=list)
+
+    @classmethod
+    def from_api_response(cls, resposta_api: dict):
+        veiculo = Veiculo.from_api_response(resposta_api)
+
+        _PATH: tuple = ("dados", "informacoes_fipe")
+        dados: list = _navegar_json(resposta_api, _PATH)
+
+        informacoes_fipe: list[_InfoFipe] = []
+        for item in dados:
+            informacoes_fipe.append(_InfoFipe.from_api_response(item))
+
+        return cls(veiculo=veiculo, informacoes_fipe=informacoes_fipe)
