@@ -84,6 +84,10 @@ class CampoAusenteErro(RespostaInesperadaErro):
     """O JSON retornado é válido, mas já chaves obrigatórias ausentes"""
     pass
 
+class CampoVazioErro(RespostaInesperadaErro):
+    """Chave obrigatória existe, mas veio em branco"""
+    pass
+
 
 class PlacaNaoEncontradaErro(RequisicaoInvalidaErro):
     """Placa informada realmente não existe ou serviço de consulta fora do ar"""
@@ -113,3 +117,13 @@ class ServicoIndisponivelErro(RespostaInesperadaErro):
     """A API não conseguiu contactar os fornecedores de informações deles"""
     # tipo_erro=servico_indisponivel
     pass
+
+class ValorInvalidoErro(RespostaInesperadaErro):
+    """Se retornar algo diferente de sim/nao/indisponivel"""
+    _MSG_PADRAO = "Valor inválido recebido para {objeto!r}"
+
+    def __init__(self, objeto: str, valor=None):
+        mensagem = self._MSG_PADRAO.format(objeto=objeto)
+        if valor is not None:
+            mensagem += f" (valor recebido: {valor!r})"
+        super().__init__(mensagem)
