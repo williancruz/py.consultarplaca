@@ -10,7 +10,7 @@ class APIConnector():
             auth=(email, api_key),
             headers={
                 "Accept": "application/json",
-                "User-Agent": "PyConsultarPlacasLib/0.1",
+                "User-Agent": "PyConsultarPlacasLib/Alpha",
             },
             transport=transport,
             timeout=10.0
